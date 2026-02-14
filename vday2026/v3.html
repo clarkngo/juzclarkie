@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mt. Hebron: Room 0214</title>
+    <style>
+        :root {
+            --bp-blue: #0a192f;
+            --bp-line: #1e3a8a;
+            --bp-accent: #64ffda;
+            --bp-text: #ccd6f6;
+        }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bp-blue);
+            color: var(--bp-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            /* Blueprint Grid Effect */
+            background-image: 
+                linear-gradient(var(--bp-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-line) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        #container {
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Room Drafting Phase */
+        #drafting-zone {
+            display: block;
+        }
+        .room-cards {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .card {
+            width: 120px;
+            height: 180px;
+            border: 2px solid var(--bp-accent);
+            border-radius: 8px;
+            background: rgba(10, 25, 47, 0.8);
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 20px var(--bp-accent);
+            background: var(--bp-accent);
+            color: var(--bp-blue);
+        }
+        .card i { font-size: 2rem; margin-bottom: 10px; }
+
+        /* The Main Menu (Hidden initially) */
+        #invitation-content {
+            display: none;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            color: #333;
+            animation: slideUp 1s ease-out;
+        }
+        .date-photo {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+        h1 { color: #d63384; font-family: 'Georgia', serif; }
+        .menu-section { margin: 1.5rem 0; }
+        .course-title { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 3px; color: #ff8fa3; }
+        .food-item { font-size: 1.2rem; font-style: italic; margin: 5px 0; }
+        hr { border: 0; height: 1px; background: #eee; margin: 15px auto; width: 60%; }
+
+        .btn {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<audio id="valentine-music" loop>
+    <source src="opalite.mp3" type="audio/mpeg">
+</audio>
+
+<div id="container">
+    <div id="drafting-zone">
+        <h2 style="letter-spacing: 5px; color: var(--bp-accent);">DRAFTING FLOOR 14</h2>
+        <p>Justine, pick a room to continue your journey through Mt. Hebron...</p>
+        
+        <div class="room-cards">
+            <div class="card" onclick="wrongRoom('The Library is locked.')">
+                <span>📚</span>
+                <p>Library</p>
+            </div>
+            <div class="card" onclick="revealDate()">
+                <span>❤️</span>
+                <p>Room 0214</p>
+            </div>
+            <div class="card" onclick="wrongRoom('The Gallery is empty.')">
+                <span>🖼️</span>
+                <p>Gallery</p>
+            </div>
+        </div>
+        <p id="hint-text" style="margin-top: 20px; color: var(--bp-accent); height: 20px;"></p>
+    </div>
+
+    <div id="invitation-content">
+        <img src="valentine-photo.jpg" alt="Date Photo" class="date-photo">
+        <h1>You Found the Secret Room!</h1>
+        <p>Valentine's Day | Feb 14, 2026</p>
+        
+        <div class="menu-section">
+            <span class="course-title">Appetizer</span>
+            <p class="food-item">French Onion Soup</p>
+        </div>
+        <hr>
+        <div class="menu-section">
+            <span class="course-title">Main Entrees</span>
+            <p class="food-item">Mushroom Cream Pasta & Pan Seared Steak</p>
+        </div>
+        <hr>
+        <div class="menu-section">
+            <span class="course-title">Desserts</span>
+            <p class="food-item">Pistachio Crepe, Cheesecake & Chocolates</p>
+        </div>
+        <hr>
+        <div class="menu-section">
+            <span class="course-title">Drink</span>
+            <p class="food-item">Classic Milk Tea</p>
+        </div>
+
+        <div id="action-area">
+            <button class="btn" onclick="celebrate()">WILL YOU BE MY VALENTINE?</button>
+        </div>
+        <h2 id="final-yay" style="display:none; color: #d63384;">IT'S A DATE! 🥰</h2>
+    </div>
+</div>
+
+<script>
+    function wrongRoom(msg) {
+        document.getElementById('hint-text').innerText = msg;
+        setTimeout(() => { document.getElementById('hint-text').innerText = ''; }, 2000);
+    }
+
+    function revealDate() {
+        // Transition from Game to Valentine
+        document.getElementById('drafting-zone').style.display = 'none';
+        document.getElementById('invitation-content').style.display = 'block';
+        document.body.style.backgroundImage = 'none';
+        document.body.style.backgroundColor = '#fff0f3';
+        
+        // Start the Taylor Swift music (Opalite)
+        document.getElementById('valentine-music').play();
+    }
+
+    function celebrate() {
+        document.getElementById('action-area').style.display = 'none';
+        document.getElementById('final-yay').style.display = 'block';
+        
+        // Heart Confetti
+        var end = Date.now() + (5 * 1000);
+        (function frame() {
+          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ff8fa3'] });
+          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d6d', '#ff8fa3'] });
+          if (Date.now() < end) { requestAnimationFrame(frame); }
+        }());
+    }
+</script>
+
+</body>
+</html>

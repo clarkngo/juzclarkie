@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juzclarkie Manor: Drafting Floor 14</title>
+    <style>
+        :root {
+            --bp-blue: #0a192f;
+            --bp-line: #1e3a8a;
+            --bp-accent: #64ffda;
+            --bp-text: #ccd6f6;
+            --val-pink: #d63384;
+            --val-sub: #ffb7c5;
+        }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bp-blue);
+            color: var(--bp-text);
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #blueprint-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--bp-line) 1px, transparent 1px), linear-gradient(90deg, var(--bp-line) 1px, transparent 1px);
+            background-size: 45px 45px;
+            z-index: -1;
+        }
+
+        /* Drafting Animation: Slide from Left */
+        .card-container { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        .room-card {
+            border: 2px solid var(--bp-line);
+            padding: 30px 15px;
+            width: 130px;
+            background: rgba(10, 25, 47, 0.9);
+            cursor: pointer;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: 0.3s;
+        }
+        .room-card.animate {
+            animation: slideIn 0.6s ease-out forwards;
+        }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .room-card:hover { border-color: var(--bp-accent); color: var(--bp-accent); box-shadow: 0 0 15px var(--bp-accent); }
+
+        /* Interactive Room Styles */
+        #interactive-display {
+            display: none;
+            position: relative;
+            width: 500px;
+            height: 350px;
+            border: 3px solid var(--bp-accent);
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+        }
+        .gem { position: absolute; font-size: 2rem; cursor: pointer; filter: drop-shadow(0 0 5px white); }
+        .silver-key { position: absolute; font-size: 3rem; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* Secret Room Styling (Based on Screenshot) */
+        #secret-room {
+            display: none;
+            background: #ffffff;
+            color: #333;
+            width: 100%;
+            max-width: 480px;
+            padding: 50px 30px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            animation: fadeIn 1.5s ease-in;
+            border-radius: 5px;
+        }
+        .val-header { color: var(--val-pink); font-size: 2.5rem; margin-bottom: 5px; font-weight: bold; }
+        .val-date { font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 40px; color: #666; }
+        .val-label { text-transform: uppercase; color: var(--val-sub); font-size: 0.75rem; letter-spacing: 4px; margin-top: 25px; }
+        .val-food { font-size: 1.4rem; font-style: italic; margin: 10px 0; color: #444; }
+        .val-divider { width: 50%; height: 1px; background: #eeeeee; margin: 20px auto; }
+        .val-btn {
+            background: #f06292;
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 40px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(240, 98, 146, 0.3);
+        }
+
+        .couple-photo { width: 100%; border-radius: 5px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Utility */
+        .hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .error-shake { animation: shake 0.5s; color: #ff4d6d; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div id="blueprint-grid"></div>
+
+<audio id="audio-start" src="blue-prince-day-start.mp3"></audio>
+<audio id="audio-game" src="blue-prince-westwardly-winds.mp3" loop></audio>
+<audio id="audio-opalite" src="opalite.mp3" loop></audio>
+
+<div id="game-container" style="text-align: center; width: 90%;">
+    <div id="phase-start">
+        <h1 style="letter-spacing: 8px; color: var(--bp-accent);">JUZCLARKIE MANOR</h1>
+        <p>Architectural Authorization Required for Room 0214.</p>
+        <button class="val-btn" style="background: var(--bp-accent); color: var(--bp-blue);" onclick="startDrafting()">Initialize Draft</button>
+    </div>
+
+    <div id="phase-draft" class="hidden">
+        <h2 id="draft-title" style="color: var(--bp-accent); text-transform: uppercase;">Draft 1: Archive Access</h2>
+        <p id="clue-text">Clue: "Follow the scent of aged paper and silent stories."</p>
+        <div class="card-container" id="card-box">
+            </div>
+    </div>
+
+    <div id="phase-interactive" class="hidden">
+        <h2 id="room-name" style="color: var(--bp-accent);">LIBRARY</h2>
+        <p id="room-task">Collect 5 Gems to proceed.</p>
+        <div id="interactive-display">
+            <div id="item-layer"></div>
+        </div>
+        <p id="progress-count" style="margin-top: 15px;"></p>
+    </div>
+</div>
+
+<div id="secret-room">
+    <img src="valentine-photo.jpg" class="couple-photo" alt="Valentine">
+    <h1 class="val-header">You Found the Secret Room!</h1>
+    <p class="val-date">Valentine's Day | Feb 14, 2026</p>
+
+    <p class="val-label">Appetizer</p>
+    <p class="val-food">French Onion Soup</p>
+    <div class="val-divider"></div>
+
+    <p class="val-label">Main Entrees</p>
+    <p class="val-food">Mushroom Cream Pasta &<br>Pan Seared Steak</p>
+    <div class="val-divider"></div>
+
+    <p class="val-label">Desserts</p>
+    <p class="val-food">Pistachio Crepe, Cheesecake &<br>Chocolates</p>
+    <div class="val-divider"></div>
+
+    <p class="val-label">Drink</p>
+    <p class="val-food">Classic Milk Tea</p>
+
+    <button class="val-btn" onclick="sayYes()">WILL YOU BE MY VALENTINE?</button>
+    <h2 id="final-yay" style="display:none; color: var(--val-pink); margin-top: 25px;">It's a date! 🥰</h2>
+</div>
+
+<script>
+    const aStart = document.getElementById('audio-start');
+    const aGame = document.getElementById('audio-game');
+    const aOpalite = document.getElementById('audio-opalite');
+
+    let currentLevel = 1;
+    let gemsFound = 0;
+
+    const draftData = {
+        1: {
+            title: "Floor 14: Archive Draft",
+            clue: "Clue: 'Follow the scent of aged paper and silent stories.'",
+            rooms: [
+                { name: "Gallery", correct: false },
+                { name: "Library", correct: true },
+                { name: "Conservatory", correct: false }
+            ]
+        },
+        2: {
+            title: "Floor 14: Hall Draft",
+            clue: "Clue: 'A place for a feast that never ends.'",
+            rooms: [
+                { name: "Dining Hall", correct: true },
+                { name: "Workshop", correct: false },
+                { name: "Office", correct: false }
+            ]
+        }
+    };
+
+    function startDrafting() {
+        document.getElementById('phase-start').classList.add('hidden');
+        document.getElementById('phase-draft').classList.remove('hidden');
+        
+        aStart.play();
+        aStart.onended = () => aGame.play();
+        
+        renderDraft();
+    }
+
+    function renderDraft() {
+        const data = draftData[currentLevel];
+        document.getElementById('draft-title').innerText = data.title;
+        document.getElementById('clue-text').innerText = data.clue;
+        document.getElementById('clue-text').classList.remove('error-shake');
+
+        const box = document.getElementById('card-box');
+        box.innerHTML = '';
+
+        data.rooms.forEach((room, index) => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.innerText = room.name;
+            card.style.animationDelay = `${index * 0.2}s`;
+            card.onclick = () => handleChoice(room.correct);
+            box.appendChild(card);
+            setTimeout(() => card.classList.add('animate'), 10);
+        });
+    }
+
+    function handleChoice(correct) {
+        if (correct) {
+            if (currentLevel === 1) enterLibrary();
+            else enterDining();
+        } else {
+            document.getElementById('clue-text').innerText = "DRAFT COLLAPSED: Restarting Floor 14...";
+            document.getElementById('clue-text').classList.add('error-shake');
+            currentLevel = 1;
+            setTimeout(renderDraft, 1200);
+        }
+    }
+
+    function enterLibrary() {
+        document.getElementById('phase-draft').classList.add('hidden');
+        document.getElementById('phase-interactive').classList.remove('hidden');
+        
+        const display = document.getElementById('interactive-display');
+        display.style.display = 'block';
+        display.style.backgroundImage = "url('library.png')";
+        
+        spawnGems();
+    }
+
+    function spawnGems() {
+        const layer = document.getElementById('item-layer');
+        layer.innerHTML = '';
+        gemsFound = 0;
+        document.getElementById('progress-count').innerText = `Gems: 0/5`;
+
+        for(let i=0; i<5; i++) {
+            const gem = document.createElement('span');
+            gem.className = 'gem';
+            gem.innerHTML = '💎';
+            gem.style.left = Math.random() * 80 + 10 + '%';
+            gem.style.top = Math.random() * 80 + 10 + '%';
+            gem.onclick = function() {
+                this.remove();
+                gemsFound++;
+                document.getElementById('progress-count').innerText = `Gems: ${gemsFound}/5`;
+                if(gemsFound === 5) {
+                    currentLevel = 2;
+                    setTimeout(() => {
+                        document.getElementById('phase-interactive').classList.add('hidden');
+                        document.getElementById('phase-draft').classList.remove('hidden');
+                        renderDraft();
+                    }, 500);
+                }
+            };
+            layer.appendChild(gem);
+        }
+    }
+
+    function enterDining() {
+        document.getElementById('phase-draft').classList.add('hidden');
+        document.getElementById('phase-interactive').classList.remove('hidden');
+        
+        const display = document.getElementById('interactive-display');
+        display.style.backgroundImage = "url('dining-room.png')";
+        document.getElementById('room-name').innerText = "DINING HALL";
+        document.getElementById('room-task').innerText = "Locate the Silver Key to unlock the secret path.";
+        
+        const layer = document.getElementById('item-layer');
+        layer.innerHTML = '<span class="silver-key" onclick="unlockSecret()">🗝️</span>';
+        document.getElementById('progress-count').innerText = "";
+    }
+
+    function unlockSecret() {
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('secret-room').style.display = 'block';
+        document.getElementById('blueprint-grid').style.display = 'none';
+        document.body.style.backgroundColor = '#ffffff';
+
+        aGame.pause();
+        aOpalite.play();
+    }
+
+    function sayYes() {
+        document.getElementById('final-yay').style.display = 'block';
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#d63384', '#ffb7c5', '#ffffff']
+        });
+    }
+</script>
+
+</body>
+</html>

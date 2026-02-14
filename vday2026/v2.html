@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Invitation for Justine</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #fff0f3;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        #invitation-container {
+            display: none; 
+            background: white;
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(255, 77, 109, 0.15);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #ffccd5;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ff4d6d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+            color: white;
+        }
+        .date-photo {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h1 { color: #d63384; font-size: 2rem; margin-bottom: 0.5rem; }
+        .course-title {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: #ff8fa3;
+            display: block;
+        }
+        .food-item { font-size: 1.3rem; font-style: italic; margin: 5px 0; color: #5c2d3a; }
+        hr { border: 0; height: 1px; background: #ffe5ec; margin: 20px auto; width: 50%; }
+        
+        .btn {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 1rem;
+        }
+        .btn:hover { transform: scale(1.05); background-color: #ff758f; }
+        
+        #success-msg { display: none; margin-top: 2rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<audio id="valentine-music" loop>
+    <source src="opalite.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<div id="overlay">
+    <h1 style="color: white; margin-bottom: 20px;">A Special Invitation for Justine...</h1>
+    <button class="btn" style="background: white; color: #ff4d6d;" onclick="initExperience()">Open Invitation</button>
+</div>
+
+<div id="invitation-container">
+    <img src="valentine-photo.jpg" alt="Justine and You" class="date-photo">
+    
+    <h1>Valentine's Date</h1>
+    <p>Today, February 13, 2026</p>
+
+    <div class="menu-section">
+        <span class="course-title">Appetizer</span>
+        <p class="food-item">French Onion Soup</p>
+    </div>
+
+    <hr>
+
+    <div class="menu-section">
+        <span class="course-title">Main Entrees</span>
+        <p class="food-item">Mushroom Cream Pasta</p>
+        <p class="food-item">Pan Seared Steak</p>
+    </div>
+
+    <hr>
+
+    <div class="menu-section">
+        <span class="course-title">Dessert Selection</span>
+        <p class="food-item">Crepe with Pistachio Ice Cream</p>
+        <p class="food-item">Chocolate Cheesecake</p>
+        <p class="food-item">Hazelnut Chocolate</p>
+    </div>
+
+    <hr>
+
+    <div class="menu-section">
+        <span class="course-title">Drink</span>
+        <p class="food-item">Classic Milk Tea</p>
+    </div>
+
+    <div id="invite-action">
+        <button class="btn" onclick="sayYes()">WILL YOU BE MY VALENTINE?</button>
+    </div>
+
+    <div id="success-msg">
+        <h1>It's a Date! 🥰</h1>
+        <p>I'll see you tonight, Justine.</p>
+    </div>
+</div>
+
+<script>
+    function initExperience() {
+        // Hide the overlay
+        document.getElementById('overlay').style.display = 'none';
+        
+        // Show the invitation
+        document.getElementById('invitation-container').style.display = 'block';
+        
+        // Play the local MP3
+        var audio = document.getElementById('valentine-music');
+        audio.play().catch(function(error) {
+            console.log("Audio play failed: ", error);
+        });
+    }
+
+    function sayYes() {
+        document.getElementById('invite-action').style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+        document.body.style.backgroundColor = "#ffccd5";
+    }
+</script>
+
+</body>
+</html>

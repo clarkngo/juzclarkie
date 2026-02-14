@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drafting Juzclarkie Manor</title>
+    <style>
+        :root {
+            --bp-blue: #0a192f;
+            --bp-line: #1e3a8a;
+            --bp-accent: #64ffda;
+            --bp-text: #ccd6f6;
+            --val-pink: #d63384;
+            --val-bg: #ffffff;
+        }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bp-blue);
+            color: var(--bp-text);
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #blueprint-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--bp-line) 1px, transparent 1px), linear-gradient(90deg, var(--bp-line) 1px, transparent 1px);
+            background-size: 45px 45px;
+            z-index: -1;
+        }
+
+        /* Drafting Animations */
+        .slide-in { animation: slideRight 0.8s ease-out forwards; opacity: 0; }
+        @keyframes slideRight {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Room UI */
+        .container { width: 90%; max-width: 600px; text-align: center; }
+        .header { font-size: 1.4rem; letter-spacing: 4px; color: var(--bp-accent); text-transform: uppercase; margin-bottom: 20px; }
+        .room-card {
+            border: 2px solid var(--bp-line);
+            padding: 25px;
+            background: rgba(10, 25, 47, 0.9);
+            margin: 10px;
+            cursor: pointer;
+            display: inline-block;
+            width: 150px;
+        }
+        .room-card:hover { border-color: var(--bp-accent); color: var(--bp-accent); }
+
+        /* Interactive Room Styles */
+        #interactive-zone {
+            display: none;
+            position: relative;
+            height: 300px;
+            border: 2px solid var(--bp-accent);
+            background: rgba(30, 58, 138, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .gem {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .gem:hover { transform: scale(1.2); }
+        .special-key {
+            position: absolute;
+            font-size: 3rem;
+            cursor: pointer;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Screenshot Styling for Secret Room */
+        #secret-room {
+            display: none;
+            background: var(--val-bg);
+            color: #333;
+            padding: 40px 20px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 500px;
+            font-family: 'Georgia', serif;
+        }
+        .val-title { color: var(--val-pink); font-size: 2.2rem; margin-bottom: 10px; }
+        .val-date { font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 30px; }
+        .val-label { text-transform: uppercase; color: #ffb7c5; font-size: 0.7rem; letter-spacing: 3px; margin-top: 20px; }
+        .val-food { font-size: 1.3rem; font-style: italic; margin: 8px 0; }
+        .val-divider { width: 60%; height: 1px; background: #eee; margin: 15px auto; }
+        .val-btn {
+            background: #f06292;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 30px;
+            cursor: pointer;
+        }
+
+        .couple-img { width: 100%; border-radius: 10px; margin-bottom: 20px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div id="blueprint-grid"></div>
+
+<audio id="audio-start" src="blue-prince-day-start.mp3"></audio>
+<audio id="audio-winds" src="blue-prince-westwardly-winds.mp3" loop></audio>
+<audio id="audio-opalite" src="opalite.mp3" loop></audio>
+
+<div class="container" id="game-container">
+    <div id="start-screen">
+        <h1 class="header">Juzclarkie Manor</h1>
+        <p>Drafting Authorization Required.</p>
+        <button class="val-btn" style="background: var(--bp-accent); color: var(--bp-blue);" onclick="beginDraft()">Initialize Draft</button>
+    </div>
+
+    <div id="draft-1" style="display:none;">
+        <p class="header">Floor 1: Select Archive</p>
+        <p>Clue: "Where stories are kept in silence."</p>
+        <div id="cards-1">
+            <div class="room-card slide-in" style="animation-delay: 0.2s;" onclick="fail()">Workshop</div>
+            <div class="room-card slide-in" style="animation-delay: 0.4s;" onclick="enterLibrary()">Library</div>
+            <div class="room-card slide-in" style="animation-delay: 0.6s;" onclick="fail()">Gallery</div>
+        </div>
+    </div>
+
+    <div id="library-zone" style="display:none;">
+        <p class="header">Library Interactive</p>
+        <p>Objective: Click to collect 5 Emerald Gems to power the drafting tool.</p>
+        <div id="interactive-zone" style="display:block;">
+            <div id="gem-container"></div>
+        </div>
+        <p id="gem-count">Gems Found: 0/5</p>
+    </div>
+
+    <div id="draft-2" style="display:none;">
+        <p class="header">Floor 2: Select Hall</p>
+        <p>Clue: "A place for a feast that never ends."</p>
+        <div id="cards-2">
+            <div class="room-card slide-in" style="animation-delay: 0.2s;" onclick="fail()">Office</div>
+            <div class="room-card slide-in" style="animation-delay: 0.4s;" onclick="enterDining()">Dining Hall</div>
+            <div class="room-card slide-in" style="animation-delay: 0.6s;" onclick="fail()">Kitchen</div>
+        </div>
+    </div>
+
+    <div id="dining-zone" style="display:none;">
+        <p class="header">Dining Hall Interactive</p>
+        <p>Objective: Find the Silver Key hidden among the tables.</p>
+        <div id="interactive-zone" style="display:block;">
+            <span class="special-key" onclick="unlockSecret()">🗝️</span>
+        </div>
+    </div>
+
+    <div id="secret-room">
+        <img src="IMG_0685.jpg" class="couple-img" alt="Us">
+        <h1 class="val-title">You Found the Secret Room!</h1>
+        <p class="val-date">Valentine's Day | Feb 14, 2026</p>
+
+        <p class="val-label">Appetizer</p>
+        <p class="val-food">French Onion Soup</p>
+        <div class="val-divider"></div>
+
+        <p class="val-label">Main Entrees</p>
+        <p class="val-food">Mushroom Cream Pasta &<br>Pan Seared Steak</p>
+        <div class="val-divider"></div>
+
+        <p class="val-label">Desserts</p>
+        <p class="val-food">Pistachio Crepe, Cheesecake &<br>Chocolates</p>
+        <div class="val-divider"></div>
+
+        <p class="val-label">Drink</p>
+        <p class="val-food">Classic Milk Tea</p>
+
+        <button class="val-btn" onclick="celebrate()">WILL YOU BE MY VALENTINE?</button>
+        <h2 id="final-msg" style="display:none; color:var(--val-pink); margin-top:20px;">It's a date! 🥰</h2>
+    </div>
+</div>
+
+<script>
+    const a1 = document.getElementById('audio-start');
+    const a2 = document.getElementById('audio-winds');
+    const aO = document.getElementById('audio-opalite');
+    let gemsFound = 0;
+
+    function beginDraft() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('draft-1').style.display = 'block';
+        a1.play();
+        a1.onended = () => a2.play();
+    }
+
+    function enterLibrary() {
+        document.getElementById('draft-1').style.display = 'none';
+        document.getElementById('library-zone').style.display = 'block';
+        spawnGems();
+    }
+
+    function spawnGems() {
+        const container = document.getElementById('gem-container');
+        for(let i=0; i<5; i++) {
+            let gem = document.createElement('span');
+            gem.className = 'gem';
+            gem.innerHTML = '💎';
+            gem.style.left = Math.random() * 80 + 10 + '%';
+            gem.style.top = Math.random() * 80 + 10 + '%';
+            gem.onclick = function() {
+                this.style.display = 'none';
+                gemsFound++;
+                document.getElementById('gem-count').innerText = `Gems Found: ${gemsFound}/5`;
+                if(gemsFound === 5) {
+                    setTimeout(() => {
+                        document.getElementById('library-zone').style.display = 'none';
+                        document.getElementById('draft-2').style.display = 'block';
+                    }, 500);
+                }
+            };
+            container.appendChild(gem);
+        }
+    }
+
+    function enterDining() {
+        document.getElementById('draft-2').style.display = 'none';
+        document.getElementById('dining-zone').style.display = 'block';
+    }
+
+    function unlockSecret() {
+        document.getElementById('dining-zone').style.display = 'none';
+        document.getElementById('secret-room').style.display = 'block';
+        document.body.style.backgroundColor = '#ffffff';
+        document.getElementById('blueprint-grid').style.display = 'none';
+        
+        a2.pause();
+        aO.play();
+    }
+
+    function fail() {
+        alert("Draft Failed: Room Unstable. Restarting Floor.");
+    }
+
+    function celebrate() {
+        document.getElementById('final-msg').style.display = 'block';
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#d63384', '#ffb7c5', '#ffffff']
+        });
+    }
+</script>
+
+</body>
+</html>

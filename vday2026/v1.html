@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Invitation for Justine</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #ffeef2;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        #container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(214, 51, 132, 0.1);
+            max-width: 450px;
+            width: 90%;
+            border: 2px solid #ffcad4;
+        }
+        .date-photo {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            border: 5px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #d63384; margin: 0.5rem 0; font-size: 1.8rem; }
+        .menu-item { display: none; animation: fadeIn 1s; }
+        .menu-item.active { display: block; }
+        .course-label { 
+            text-transform: uppercase; 
+            font-size: 0.75rem; 
+            letter-spacing: 3px; 
+            color: #ff8fa3;
+            margin-top: 1rem;
+        }
+        .food-name { font-size: 1.4rem; margin: 10px 0 25px 0; font-style: italic; color: #5c2d3a; }
+        button {
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+        }
+        button:hover { transform: translateY(-2px); background-color: #ff758f; }
+        #final-msg { display: none; }
+        #music-player { display: none; } /* Hidden music player */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div id="music-player">
+    <iframe id="player" width="1" height="1" src="https://youtu.be/4FUIEcnvT04?si=lKZV2gb2y3laum6I" frameborder="0" allow="autoplay"></iframe>
+</div>
+
+<div id="container">
+    <img src="valentine-photo.jpg" alt="Justine and You" class="date-photo">
+
+    <div id="step-0" class="menu-item active">
+        <h1>Hi Justine Cho ❤️</h1>
+        <p>I've put together a little something for us today.</p>
+        <button onclick="startExperience()">See the Menu</button>
+    </div>
+
+    <div id="step-1" class="menu-item">
+        <p class="course-label">— To Begin —</p>
+        <p class="food-name">French Onion Soup</p>
+        <button onclick="nextStep(2)">Next Course</button>
+    </div>
+
+    <div id="step-2" class="menu-item">
+        <p class="course-label">— The Main Event —</p>
+        <p class="food-name">Mushroom Cream Pasta &<br>Pan Seared Steak</p>
+        <button onclick="nextStep(3)">Something Sweet?</button>
+    </div>
+
+    <div id="step-3" class="menu-item">
+        <p class="course-label">— Dessert Trio —</p>
+        <p class="food-name">Crepe with Pistachio Ice Cream,<br>Chocolate Cheesecake &<br>Hazelnut Chocolate</p>
+        <button onclick="nextStep(4)">To drink?</button>
+    </div>
+
+    <div id="step-4" class="menu-item">
+        <p class="course-label">— Refreshment —</p>
+        <p class="food-name">Classic Milk Tea</p>
+        <button onclick="nextStep(5)">One last thing...</button>
+    </div>
+
+    <div id="step-5" class="menu-item">
+        <h1>Happy Valentine's!</h1>
+        <p>Will you be my date tonight, Justine?</p>
+        <button onclick="accept()">YES!</button>
+    </div>
+
+    <div id="final-msg">
+        <h1>Yay! 🥰</h1>
+        <p>It's a date. See you tonight!</p>
+    </div>
+</div>
+
+<script>
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player');
+    }
+
+    function startExperience() {
+        // Start the Taylor Swift music
+        var iframe = document.getElementById('player');
+        iframe.src += "&autoplay=1";
+        nextStep(1);
+    }
+
+    function nextStep(stepNum) {
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + stepNum).classList.add('active');
+    }
+
+    function accept() {
+        document.getElementById('step-5').style.display = 'none';
+        document.getElementById('final-msg').style.display = 'block';
+    }
+</script>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+</body>
+</html>

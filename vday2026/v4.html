@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drafting Juzclarkie Manor</title>
+    <style>
+        :root {
+            --bp-blue: #0a192f;
+            --bp-line: #1e3a8a;
+            --bp-accent: #64ffda;
+            --bp-text: #ccd6f6;
+            --bp-error: #ff4d6d;
+        }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bp-blue);
+            color: var(--bp-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(var(--bp-line) 1px, transparent 1px), linear-gradient(90deg, var(--bp-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        #container { max-width: 600px; width: 90%; text-align: center; }
+        
+        /* Game UI */
+        .header { font-size: 1.5rem; letter-spacing: 5px; color: var(--bp-accent); margin-bottom: 5px; text-transform: uppercase; }
+        .clue-box { border: 1px solid var(--bp-accent); padding: 15px; margin: 20px 0; min-height: 50px; font-style: italic; background: rgba(30, 58, 138, 0.2); line-height: 1.5; }
+        .room-grid { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        
+        .room-card {
+            border: 2px solid var(--bp-line);
+            padding: 30px 10px;
+            width: 140px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(10, 25, 47, 0.9);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .room-card:hover { border-color: var(--bp-accent); background: var(--bp-line); transform: translateY(-5px); }
+        
+        /* Invitation Styling */
+        #invitation-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            color: #333;
+            animation: fadeIn 1.5s;
+        }
+        .date-photo { width: 100%; border-radius: 15px; margin-bottom: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h1 { color: #d63384; font-family: 'Georgia', serif; font-size: 1.8rem; }
+        .menu-item { margin: 10px 0; font-size: 1.1rem; }
+        .btn { background: #ff4d6d; color: white; border: none; padding: 15px 35px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: #ff758f; transform: scale(1.05); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .shake { animation: shake 0.5s; color: var(--bp-error); border-color: var(--bp-error) !important; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<audio id="audio1" src="blue-prince-day-start.mp3"></audio>
+<audio id="audio2" src="blue-prince-westwardly-winds.mp3" loop></audio>
+
+<div id="container">
+    <div id="game-ui">
+        <div class="header" id="current-location">Entrance Hall</div>
+        <div class="clue-box" id="clue-text">Welcome to Juzclarkie Manor. <br>Objective: Draft your path to the Secret Room.</div>
+        
+        <div id="start-btn-area">
+            <button class="btn" style="background: var(--bp-accent); color: var(--bp-blue);" onclick="initGame()">Initialize Draft</button>
+        </div>
+
+        <div id="room-selection" style="display:none;" class="room-grid">
+            </div>
+    </div>
+
+    <div id="invitation-content">
+        <img src="valentine-photo.jpg" alt="Valentine Photo" class="date-photo">
+        <h1>Room 0214: The Heart of the Manor</h1>
+        <p>You've successfully drafted the perfect path, Justine.</p>
+        <hr style="border:0; height:1px; background:#eee; margin:20px;">
+        
+        <div class="menu-item"><b>Appetizer:</b> French Onion Soup</div>
+        <div class="menu-item"><b>Main:</b> Mushroom Cream Pasta & Pan Seared Steak</div>
+        <div class="menu-item"><b>Dessert:</b> Pistachio Crepe & Chocolate Selection</div>
+        <div class="menu-item"><b>Drink:</b> Milk Tea</div>
+
+        <div id="action-area" style="margin-top:25px;">
+            <button class="btn" onclick="sayYes()">WILL YOU BE MY VALENTINE?</button>
+        </div>
+        <h2 id="final-yay" style="display:none; color: #d63384; font-family: 'Georgia', serif;">IT'S A DATE! 🥰</h2>
+    </div>
+</div>
+
+<script>
+    let currentLevel = 0;
+    const levels = [
+        {
+            location: "Manor Floor - Draft 1",
+            clue: "Clue: 'Follow the scent of aged paper and silent stories.'",
+            rooms: [
+                { name: "Conservatory", correct: false },
+                { name: "Library", correct: true },
+                { name: "Gallery", correct: false }
+            ]
+        },
+        {
+            location: "Manor Floor - Draft 2",
+            clue: "Clue: 'A place where the table is set, but the feast is yet to begin.'",
+            rooms: [
+                { name: "Office", correct: false },
+                { name: "Workshop", correct: false },
+                { name: "Dining Hall", correct: true }
+            ]
+        },
+        {
+            location: "The Final Draft",
+            clue: "Final Objective: Locate Room 0214.",
+            rooms: [
+                { name: "Room 0214", correct: true }
+            ]
+        }
+    ];
+
+    function initGame() {
+        document.getElementById('start-btn-area').style.display = 'none';
+        document.getElementById('room-selection').style.display = 'flex';
+        
+        const a1 = document.getElementById('audio1');
+        const a2 = document.getElementById('audio2');
+        
+        // Start "Day Start" music
+        a1.play().catch(e => console.log("Audio block: Click again."));
+        a1.onended = () => a2.play();
+        
+        renderLevel();
+    }
+
+    function renderLevel() {
+        const level = levels[currentLevel];
+        document.getElementById('current-location').innerText = level.location;
+        document.getElementById('clue-text').innerHTML = level.clue;
+        document.getElementById('clue-text').classList.remove('shake');
+        
+        const grid = document.getElementById('room-selection');
+        grid.innerHTML = '';
+        
+        level.rooms.forEach(room => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.innerText = room.name;
+            card.onclick = () => handleChoice(room.correct);
+            grid.appendChild(card);
+        });
+    }
+
+    function handleChoice(isCorrect) {
+        if (isCorrect) {
+            currentLevel++;
+            if (currentLevel >= levels.length) {
+                showInvitation();
+            } else {
+                renderLevel();
+            }
+        } else {
+            // Restart Logic - "Floor Collapse"
+            document.getElementById('clue-text').innerText = "DRAFT ERROR: Floor Collapsed. Returning to Entrance Hall...";
+            document.getElementById('clue-text').classList.add('shake');
+            currentLevel = 0;
+            setTimeout(renderLevel, 1500);
+        }
+    }
+
+    function showInvitation() {
+        document.getElementById('game-ui').style.display = 'none';
+        document.getElementById('invitation-content').style.display = 'block';
+        document.body.style.backgroundImage = 'none';
+        document.body.style.backgroundColor = '#fff0f3';
+    }
+
+    function sayYes() {
+        document.getElementById('action-area').style.display = 'none';
+        document.getElementById('final-yay').style.display = 'block';
+        
+        // Heart confetti burst
+        var end = Date.now() + (5 * 1000);
+        (function frame() {
+          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4d6d', '#ff8fa3'] });
+          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4d6d', '#ff8fa3'] });
+          if (Date.now() < end) { requestAnimationFrame(frame); }
+        }());
+    }
+</script>
+
+</body>
+</html>

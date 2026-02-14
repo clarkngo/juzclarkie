@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juzclarkie Ballroom: Salsa Lesson</title>
+    <style>
+        :root {
+            --ballroom-red: #8b0000;
+            --ballroom-gold: #ffd700;
+            --heart-pink: #ff69b4;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--ballroom-red);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-y: auto;
+            text-align: center;
+            padding: 50px 0;
+            /* Romantic pattern background */
+            background-image: radial-gradient(#a30000 20%, transparent 20%), radial-gradient(#a30000 20%, transparent 20%);
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px;
+        }
+        .container { width: 90%; max-width: 550px; background: rgba(0,0,0,0.4); padding: 30px; border-radius: 20px; border: 3px solid var(--ballroom-gold); }
+        h1 { color: var(--ballroom-gold); font-size: 2.2rem; margin-bottom: 10px; text-shadow: 2px 2px 5px #000; }
+        
+        .step-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--heart-pink);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            display: none;
+            animation: fadeIn 2s;
+        }
+        .count-badge {
+            display: inline-block;
+            width: 50px; height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            background: var(--ballroom-gold);
+            color: var(--ballroom-red);
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px var(--ballroom-gold);
+        }
+        .instruction { font-size: 1.3rem; line-height: 1.6; }
+        
+        .btn {
+            background: var(--ballroom-gold);
+            color: var(--ballroom-red);
+            border: none;
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--ballroom-gold); }
+        .back-nav { display: block; margin-top: 40px; color: var(--ballroom-gold); text-decoration: none; font-weight: bold; font-size: 1.1rem; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<audio id="salsa-audio" src="salsa.mp3" loop></audio>
+
+<div class="container">
+    <h1>The Juzclarkie Ballroom</h1>
+    <p>A romantic detour, Justine. Let's learn our first dance.</p>
+
+    <div id="intro">
+        <button class="btn" onclick="startLesson()">Start the Salsa Lesson</button>
+    </div>
+
+    <div id="step-1" class="step-box">
+        <div class="count-badge">1-2-3</div>
+        <div class="instruction">Step forward with your LEFT foot, rock back onto your RIGHT, and step back to center with your LEFT.</div>
+    </div>
+
+    <div id="step-2" class="step-box">
+        <div class="count-badge">4</div>
+        <div class="instruction">Pause. Keep your weight centered and feel the beat.</div>
+    </div>
+
+    <div id="step-3" class="step-box">
+        <div class="count-badge">5-6-7</div>
+        <div class="instruction">Step back with your RIGHT foot, rock forward onto your LEFT, and step back to center with your RIGHT.</div>
+    </div>
+
+    <div id="step-4" class="step-box">
+        <div class="count-badge">8</div>
+        <div class="instruction">Pause. Breathe. You're doing perfectly. ❤️</div>
+    </div>
+
+    <div id="outro" style="display:none;">
+        <p style="font-size: 1.2rem; margin-top: 30px;">Ready to find the heart of the manor?</p>
+        <a href="index.html" class="back-nav">← Return to the Draft</a>
+    </div>
+</div>
+
+
+
+<script>
+    function startLesson() {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('salsa-audio').play();
+        
+        const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+        // "Really slow" timing: 4 seconds (4000ms) between each step
+        steps.forEach((id, index) => {
+            setTimeout(() => {
+                document.getElementById(id).style.display = 'block';
+                if (index === steps.length - 1) {
+                    setTimeout(() => {
+                        document.getElementById('outro').style.display = 'block';
+                    }, 4000);
+                }
+            }, (index + 1) * 4000);
+        });
+    }
+</script>
+</body>
+</html>
