@@ -40,9 +40,7 @@
     gap: 32px;
   }
 
-  .title {
-    text-align: center;
-  }
+  .title { text-align: center; }
   .title h1 {
     font-family: 'Cinzel', serif;
     font-size: 1.4rem;
@@ -79,7 +77,7 @@
     background: #0d1020;
     border: 1px solid #22283c;
     border-radius: 6px;
-    padding: 20px 18px;
+    padding: 18px 18px 14px;
     transition: border-color 0.25s, box-shadow 0.25s;
     position: relative;
     overflow: hidden;
@@ -119,7 +117,27 @@
     font-weight: 300;
     color: #7a7464;
     line-height: 1.5;
+    margin-bottom: 12px;
   }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #22283c;
+    border-radius: 4px;
+    color: #6b7a9e;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .copy-btn:hover { border-color: #c9a84c; color: #c9a84c; }
+  .copy-btn.copied { border-color: #5a9e7a; color: #5a9e7a; }
 
   .footer {
     font-size: 0.7rem;
@@ -128,6 +146,27 @@
     letter-spacing: 1px;
     text-align: center;
   }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: #5a9e7a;
+    color: #07091c;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-weight: 600;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+    white-space: nowrap;
+    z-index: 100;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -145,6 +184,9 @@
       <div class="card-label">Valentine's Day · 2026</div>
       <div class="card-title">A Love Letter</div>
       <div class="card-desc">Something made just for you, with all my heart.</div>
+      <button class="copy-btn" onclick="copyLink(event, 'vday2026/index.html')">
+        🔗 Copy Link
+      </button>
     </a>
 
     <a class="card" href="./juzbday2026/index.html">
@@ -152,11 +194,40 @@
       <div class="card-label">Birthday Quest · 2026</div>
       <div class="card-title">Expedition 36</div>
       <div class="card-desc">Born past the Paintress's decree — your scavenger hunt awaits.</div>
+      <button class="copy-btn" onclick="copyLink(event, 'juzbday2026/index.html')">
+        🔗 Copy Link
+      </button>
     </a>
   </div>
 
   <hr>
   <div class="footer">made with love · clark</div>
 </div>
+
+<div class="toast" id="toast">✓ Link Copied</div>
+
+<script>
+  function copyLink(e, path) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const base = window.location.origin + window.location.pathname.replace(/\/?$/, '/');
+    const url  = base + path;
+
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = e.currentTarget;
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '🔗 Copy Link';
+        btn.classList.remove('copied');
+      }, 2000);
+
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    });
+  }
+</script>
 </body>
 </html>
