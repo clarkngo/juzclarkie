@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hoard of the Dragon — Birthday Quest</title>
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:    #d4a017;
+    --gold-lt: #f0c040;
+    --ember:   #e8622a;
+    --ember-lt:#ff8c42;
+    --dark:    #0e0e12;
+    --panel:   #1a1a24;
+    --panel2:  #22222e;
+    --stone:   #2e2e3a;
+    --text:    #e8dfc8;
+    --dim:     #8a7f6a;
+    --green:   #52b788;
+    --red:     #e05c5c;
+    --radius:  10px;
+  }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED BACKGROUND EMBERS ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(232,98,42,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(212,160,23,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 12px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 20px 10px 10px;
+  }
+  .header .crown { font-size: 2.4rem; animation: float 3s ease-in-out infinite; }
+  .header h1 {
+    font-size: 1.55rem;
+    color: var(--gold);
+    text-shadow: 0 0 18px rgba(212,160,23,0.5);
+    letter-spacing: 1px;
+    line-height: 1.25;
+    margin: 6px 0 2px;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── XP BAR ── */
+  .xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .xp-track {
+    background: var(--stone);
+    border-radius: 100px;
+    height: 14px;
+    overflow: hidden;
+    border: 1px solid #3a3a4a;
+  }
+  .xp-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--ember), var(--gold));
+    width: 0%;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 10px rgba(212,160,23,0.4);
+  }
+
+  /* ── TORCH DIVIDER ── */
+  .torch-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .torch-row hr { flex: 1; border: none; border-top: 1px solid #3a3a4a; }
+  .torch {
+    font-size: 1.1rem;
+    display: inline-block;
+    animation: flicker 0.15s infinite alternate;
+    filter: drop-shadow(0 0 6px #f08030);
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid #3a3a4a;
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .panel-title {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 10px;
+  }
+
+  /* ── STAGE CARD ── */
+  .stage-card {
+    background: var(--panel2);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    animation: shimmer 2.5s linear infinite;
+  }
+  .stage-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--stone);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold-lt);
+    margin-bottom: 10px;
+  }
+  .stage-title {
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(212,160,23,0.3);
+  }
+  .stage-riddle {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text);
+    font-style: italic;
+    border-left: 2px solid var(--ember);
+    padding-left: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* ── CODE INPUT ── */
+  .code-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .code-input {
+    flex: 1;
+    background: var(--stone);
+    border: 1px solid #4a4a5a;
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .code-input:focus { border-color: var(--gold); }
+  .code-input::placeholder { color: var(--dim); }
+  .unlock-btn {
+    background: linear-gradient(135deg, var(--ember), var(--gold));
+    border: none;
+    border-radius: 6px;
+    color: #0e0e12;
+    font-weight: bold;
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.1s;
+    font-family: Georgia, serif;
+    letter-spacing: 0.5px;
+  }
+  .unlock-btn:active { transform: scale(0.96); opacity: 0.85; }
+
+  .msg {
+    font-size: 0.82rem;
+    min-height: 18px;
+    padding-left: 2px;
+    transition: color 0.3s;
+  }
+  .msg.success { color: var(--green); }
+  .msg.error   { color: var(--red);   }
+
+  /* ── QUEST LOG ── */
+  .quest-log-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .quest-log-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.83rem;
+    line-height: 1.45;
+    color: var(--dim);
+    transition: color 0.5s;
+  }
+  .quest-log-list li.active { color: var(--text); }
+  .quest-log-list li.done   { color: var(--green); }
+  .quest-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── INVENTORY ── */
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .inv-slot {
+    background: var(--stone);
+    border: 1px solid #3a3a4a;
+    border-radius: 8px;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 1.5rem;
+    transition: border-color 0.4s, box-shadow 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .inv-slot.locked { opacity: 0.3; }
+  .inv-slot.unlocked {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(212,160,23,0.2);
+    animation: popIn 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .inv-name {
+    font-size: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold-lt);
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 2px;
+  }
+  .inv-slot.locked .inv-name { color: var(--dim); }
+
+  /* ── VICTORY SCREEN ── */
+  #victory {
+    display: none;
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--panel2);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+  #victory .vic-emoji { font-size: 3rem; animation: float 2s ease-in-out infinite; }
+  #victory h2 {
+    font-size: 1.5rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(212,160,23,0.6);
+    margin: 10px 0 6px;
+  }
+  #victory p { font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+  .confetti-container {
+    position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    top: -10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+
+  /* ── MUSIC BTN ── */
+  .music-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--stone);
+    border: 1px solid #4a4a5a;
+    border-radius: 8px;
+    color: var(--dim);
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    padding: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .music-btn:hover { border-color: var(--gold); color: var(--gold-lt); }
+  .music-btn.playing { color: var(--gold-lt); border-color: var(--gold); }
+
+  .visualizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+  }
+  .bar {
+    width: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    height: 4px;
+    transition: height 0.1s;
+  }
+  .playing .bar:nth-child(1) { animation: dance 0.6s ease-in-out infinite; }
+  .playing .bar:nth-child(2) { animation: dance 0.45s ease-in-out infinite 0.1s; }
+  .playing .bar:nth-child(3) { animation: dance 0.55s ease-in-out infinite 0.2s; }
+  .playing .bar:nth-child(4) { animation: dance 0.4s ease-in-out infinite 0.05s; }
+  .playing .bar:nth-child(5) { animation: dance 0.65s ease-in-out infinite 0.15s; }
+
+  /* ── QUEST UPDATED TOAST ── */
+  .toast {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--green);
+    color: #0e0e12;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 100px;
+    z-index: 500;
+    transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── KEYFRAMES ── */
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  @keyframes flicker {
+    0%   { opacity: 1;    transform: scale(1) rotate(-1deg); }
+    100% { opacity: 0.82; transform: scale(1.04) rotate(1deg); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes dance {
+    0%,100% { height: 4px; }
+    50%      { height: 16px; }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.7); opacity: 0; }
+    60%  { transform: scale(1.1); }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── STAGE CAROUSEL ── */
+  #stage-area {
+    overflow: hidden;
+    border-radius: var(--radius);
+  }
+  .carousel-track {
+    display: flex;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  }
+  .stage-card {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  /* ── CAROUSEL NAV ── */
+  .carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .nav-btn {
+    background: var(--stone);
+    border: 1px solid #4a4a5a;
+    border-radius: 8px;
+    color: var(--dim);
+    font-family: Georgia, serif;
+    font-size: 0.82rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:not(:disabled):hover { border-color: var(--gold); color: var(--gold-lt); }
+  .nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .nav-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--stone);
+    border: 1px solid #4a4a5a;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .nav-dot.unlocked { border-color: var(--dim); }
+  .nav-dot.active   { background: var(--gold); border-color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="app-wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="crown">🐉</div>
+    <h1>The Hoard of the Dragon</h1>
+    <div class="subtitle">Birthday Quest · 2026</div>
+  </div>
+
+  <!-- XP BAR -->
+  <div class="xp-section">
+    <div class="xp-label">
+      <span>⚔️ Adventurer's Progress</span>
+      <span id="xp-text">0 / 4 Treasures</span>
+    </div>
+    <div class="xp-track">
+      <div class="xp-fill" id="xp-fill"></div>
+    </div>
+  </div>
+
+  <!-- QUEST LOG -->
+  <div class="panel">
+    <div class="panel-title">📜 Quest Log</div>
+    <ul class="quest-log-list">
+      <li class="active" id="log-1">
+        <span class="quest-icon">🔨</span>
+        <span>Stage 1 — The Forge: Seek the cold iron hearth.</span>
+      </li>
+      <li id="log-2">
+        <span class="quest-icon">🏡</span>
+        <span>Stage 2 — The Nook: Where fellowship gathers.</span>
+      </li>
+      <li id="log-3">
+        <span class="quest-icon">🏔️</span>
+        <span>Stage 3 — High Peaks: Ascend to the summit.</span>
+      </li>
+      <li id="log-4">
+        <span class="quest-icon">🏰</span>
+        <span>Stage 4 — Inner Sanctum: Descend into the deep.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="panel">
+    <div class="panel-title">🎒 Inventory — Looted Treasure</div>
+    <div class="inventory-grid">
+      <div class="inv-slot locked" id="inv-1">
+        <span class="inv-icon">❓</span>
+        <div class="inv-name">???</div>
+      </div>
+      <div class="inv-slot locked" id="inv-2">
+        <span class="inv-icon">❓</span>
+        <div class="inv-name">???</div>
+      </div>
+      <div class="inv-slot locked" id="inv-3">
+        <span class="inv-icon">❓</span>
+        <div class="inv-name">???</div>
+      </div>
+      <div class="inv-slot locked" id="inv-4">
+        <span class="inv-icon">❓</span>
+        <div class="inv-name">???</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="torch-row">
+    <hr><span class="torch">🔥</span><hr>
+  </div>
+
+  <!-- STAGE CAROUSEL -->
+  <div id="stage-area">
+    <div class="carousel-track" id="carousel-track">
+
+      <!-- STAGE 1 -->
+      <div class="stage-card" id="stage-1">
+        <div class="stage-badge">📍 Stage 1 of 4 &nbsp;·&nbsp; The Forge</div>
+        <div class="stage-title">🔨 The Artisan's Forge</div>
+        <div class="stage-riddle">
+          "The village crafters tend their flames with care,<br>
+          yet one great hearth sits cold — no fire there.<br>
+          Within its iron belly, dark and still,<br>
+          a clutch of little dragons waits to fill<br>
+          your hands with wonder. Seek the iron maw<br>
+          that opens wide by handle — not by claw."
+        </div>
+        <div class="code-row">
+          <input class="code-input" id="input-1" type="text" placeholder="Enter Secret Keyword…" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="unlock-btn" onclick="tryUnlock(1)">Unlock ⚡</button>
+        </div>
+        <div class="msg" id="msg-1"></div>
+      </div>
+
+      <!-- STAGE 2 -->
+      <div class="stage-card" id="stage-2">
+        <div class="stage-badge">📍 Stage 2 of 4 &nbsp;·&nbsp; The Nook</div>
+        <div class="stage-title">🏡 The Hearthside Nook</div>
+        <div class="stage-riddle">
+          "The snow may fall and sleigh bells ring,<br>
+          but heroes don't rest — they slay everything.<br>
+          Where warmth gathers and fellowship grows,<br>
+          beside the cold hearth where the winter wind blows.<br>
+          A party expansion awaits you near —<br>
+          find the spot where the whole crew convenes for good cheer."
+        </div>
+        <div class="code-row">
+          <input class="code-input" id="input-2" type="text" placeholder="Enter Secret Keyword…" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="unlock-btn" onclick="tryUnlock(2)">Unlock ⚡</button>
+        </div>
+        <div class="msg" id="msg-2"></div>
+      </div>
+
+      <!-- STAGE 3 -->
+      <div class="stage-card" id="stage-3">
+        <div class="stage-badge">📍 Stage 3 of 4 &nbsp;·&nbsp; The High Peaks</div>
+        <div class="stage-title">🏔️ The High Peaks</div>
+        <div class="stage-riddle">
+          "Higher than the forge, beyond the hearthside glow,<br>
+          the mountain summit calls where only wind can go.<br>
+          The ruler's chambers crown the keep with grace —<br>
+          but riches lie concealed within a secret place.<br>
+          Enter the passage where garments hang in rows,<br>
+          hidden 'twixt the finery, a treasure no one knows."
+        </div>
+        <div class="code-row">
+          <input class="code-input" id="input-3" type="text" placeholder="Enter Secret Keyword…" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="unlock-btn" onclick="tryUnlock(3)">Unlock ⚡</button>
+        </div>
+        <div class="msg" id="msg-3"></div>
+      </div>
+
+      <!-- STAGE 4 -->
+      <div class="stage-card" id="stage-4">
+        <div class="stage-badge">📍 Stage 4 of 4 &nbsp;·&nbsp; The Inner Sanctum</div>
+        <div class="stage-title">🏰 The Inner Sanctum</div>
+        <div class="stage-riddle">
+          "Descend, brave adventurer, into the deep —<br>
+          where legends are born and great dragons sleep.<br>
+          The sanctum of games, the vault of all play,<br>
+          holds one final treasure to close out your day.<br>
+          No keyword to seek — just open the door.<br>
+          The sweetest of hoards lies in wait on the floor."
+        </div>
+        <div style="font-size:0.75rem; color:var(--dim); margin-bottom:12px;">
+          🎂 <em>The final reward is waiting — no keyword needed!</em>
+        </div>
+        <button class="unlock-btn" style="width:100%; padding:13px; font-size:1rem;" onclick="completeFinal()">
+          🏆 Claim the Hoard!
+        </button>
+      </div>
+
+    </div>
+  </div><!-- /stage-area -->
+
+  <!-- CAROUSEL NAV -->
+  <div class="carousel-nav" id="carousel-nav">
+    <button class="nav-btn" id="nav-prev" onclick="navCarousel(-1)" disabled>&#8592; Back</button>
+    <span class="nav-dots" id="nav-dots"></span>
+    <button class="nav-btn" id="nav-next" onclick="navCarousel(1)" disabled>Next &#8594;</button>
+  </div>
+
+  <!-- VICTORY SCREEN -->
+  <div id="victory">
+    <div class="vic-emoji">🎂</div>
+    <h2>Quest Complete!</h2>
+    <p>
+      The dragon's hoard is yours, brave adventurer!<br><br>
+      You've looted the Forge, found allies at the Hearth,<br>
+      scaled the High Peaks, and breached the Inner Sanctum.<br><br>
+      <strong style="color:var(--gold)">Happy Birthday! 🎉🐉</strong><br><br>
+      <em style="font-size:0.8rem; color:var(--dim)">Your final reward: a Chocolate Mousse Cake awaits.</em>
+    </p>
+  </div>
+
+  <!-- MUSIC -->
+  <div class="panel" style="padding:12px 16px;">
+    <div class="panel-title">🎵 Adventure Music</div>
+    <button class="music-btn" id="music-btn" onclick="toggleMusic()">
+      <div class="visualizer" id="vis">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <span id="music-label">Play Adventure Music</span>
+    </button>
+    <div style="font-size:0.68rem; color:var(--dim); margin-top:7px; text-align:center;">
+      ♪ A brave tune for a braver adventurer ♪
+    </div>
+  </div>
+
+</div><!-- /app-wrap -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">✨ Quest Log Updated!</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-container" id="confetti-container"></div>
+
+<script>
+  // ── CONFIG ──
+  // Keywords are case-insensitive. Change these to whatever you write on the gift tags!
+  const KEYWORDS = {
+    1: "flamecraft",   // Stage 1 → Stage 2
+    2: "sleigh",       // Stage 2 → Stage 3
+    3: "cascadia",     // Stage 3 → Stage 4
+  };
+
+  // ── STATE ──
+  let unlockedStage = 1; // furthest stage reached
+  let viewStage     = 1; // currently visible card
+  let musicPlaying  = false;
+
+  // ── CAROUSEL NAV ──
+  function buildDots() {
+    const dotsEl = document.getElementById("nav-dots");
+    dotsEl.innerHTML = "";
+    for (let i = 1; i <= 4; i++) {
+      const d = document.createElement("span");
+      d.className = "nav-dot" + (i <= unlockedStage ? " unlocked" : "") + (i === viewStage ? " active" : "");
+      d.id = `dot-${i}`;
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function slideTo(stage) {
+    viewStage = stage;
+    document.getElementById("carousel-track").style.transform =
+      `translateX(-${(stage - 1) * 100}%)`;
+    // Update dots
+    document.querySelectorAll(".nav-dot").forEach((d, i) => {
+      d.classList.toggle("active", i + 1 === stage);
+    });
+    // Update buttons
+    document.getElementById("nav-prev").disabled = stage <= 1;
+    document.getElementById("nav-next").disabled = stage >= unlockedStage;
+  }
+
+  function navCarousel(dir) {
+    const target = viewStage + dir;
+    if (target < 1 || target > unlockedStage) return;
+    slideTo(target);
+  }
+
+  // ── UNLOCK LOGIC ──
+  function tryUnlock(stage) {
+    const input = document.getElementById(`input-${stage}`);
+    const msg   = document.getElementById(`msg-${stage}`);
+    const val   = input.value.trim().toLowerCase();
+
+    if (!val) {
+      showMsg(msg, "⚠️ Speak the keyword, adventurer!", "error");
+      return;
+    }
+    if (val === KEYWORDS[stage]) {
+      showMsg(msg, "✅ The lock yields! Proceed onward!", "success");
+      input.disabled = true;
+      setTimeout(() => advanceStage(stage), 700);
+    } else {
+      showMsg(msg, "❌ The runes reject your word. Try again.", "error");
+      input.classList.add("shake");
+      setTimeout(() => input.classList.remove("shake"), 500);
+    }
+  }
+
+  function advanceStage(completedStage) {
+    // Update quest log
+    const logItem = document.getElementById(`log-${completedStage}`);
+    logItem.classList.remove("active");
+    logItem.classList.add("done");
+    logItem.querySelector(".quest-icon").textContent = "✅";
+
+    // Unlock inventory slot — reveal name + icon
+    const INV_DATA = {
+      1: { icon: "🐉", name: "Flamecraft Meeps" },
+      2: { icon: "⚔️", name: "Here to Sleigh" },
+      3: { icon: "🌿", name: "Cascadia" },
+      4: { icon: "🎂", name: "Mousse Cake!" },
+    };
+    const inv = document.getElementById(`inv-${completedStage}`);
+    inv.querySelector(".inv-icon").textContent = INV_DATA[completedStage].icon;
+    inv.querySelector(".inv-name").textContent = INV_DATA[completedStage].name;
+    inv.classList.remove("locked");
+    inv.classList.add("unlocked");
+
+    // Advance furthest stage and slide to it
+    unlockedStage = completedStage + 1;
+    document.getElementById(`dot-${unlockedStage}`)?.classList.add("unlocked");
+    document.getElementById(`log-${unlockedStage}`)?.classList.add("active");
+    slideTo(unlockedStage);
+
+    if (unlockedStage <= 3) {
+      setTimeout(() => document.getElementById(`input-${unlockedStage}`)?.focus(), 650);
+    }
+
+    // XP bar
+    const pct = (completedStage / 4) * 100;
+    document.getElementById("xp-fill").style.width = pct + "%";
+    document.getElementById("xp-text").textContent = `${completedStage} / 4 Treasures`;
+
+    showToast();
+  }
+
+  function completeFinal() {
+    // Mark final stage done
+    const logItem = document.getElementById(`log-4`);
+    logItem.classList.remove("active");
+    logItem.classList.add("done");
+    logItem.querySelector(".quest-icon").textContent = "✅";
+
+    const inv4 = document.getElementById("inv-4");
+    inv4.querySelector(".inv-icon").textContent = "🎂";
+    inv4.querySelector(".inv-name").textContent = "Mousse Cake!";
+    inv4.classList.remove("locked");
+    inv4.classList.add("unlocked");
+
+    document.getElementById("xp-fill").style.width = "100%";
+    document.getElementById("xp-text").textContent = "4 / 4 Treasures";
+
+    document.getElementById("stage-area").style.display = "none";
+    document.getElementById("carousel-nav").style.display = "none";
+    document.getElementById("victory").style.display = "block";
+
+    setTimeout(launchConfetti, 400);
+    showToast("🏆 Quest Complete!");
+  }
+
+  // ── TOAST ──
+  function showToast(text) {
+    const toast = document.getElementById("toast");
+    if (text) toast.textContent = text;
+    else toast.textContent = "✨ Quest Log Updated!";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2400);
+  }
+
+  // ── MSG ──
+  function showMsg(el, text, type) {
+    el.textContent = text;
+    el.className = "msg " + type;
+  }
+
+  // ── MUSIC ──
+  function toggleMusic() {
+    musicPlaying = !musicPlaying;
+    const btn   = document.getElementById("music-btn");
+    const label = document.getElementById("music-label");
+    const vis   = document.getElementById("vis");
+    if (musicPlaying) {
+      btn.classList.add("playing");
+      vis.classList.add("playing");
+      label.textContent = "Pause Adventure Music";
+    } else {
+      btn.classList.remove("playing");
+      vis.classList.remove("playing");
+      label.textContent = "Play Adventure Music";
+    }
+  }
+
+  // ── CONFETTI ──
+  function launchConfetti() {
+    const container = document.getElementById("confetti-container");
+    const colors = ["#d4a017","#f0c040","#e8622a","#52b788","#e8dfc8","#e05c5c","#7b5ea7"];
+    for (let i = 0; i < 90; i++) {
+      const piece = document.createElement("div");
+      piece.className = "confetti-piece";
+      piece.style.left        = Math.random() * 100 + "vw";
+      piece.style.background  = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.width       = (Math.random() * 8 + 6) + "px";
+      piece.style.height      = (Math.random() * 8 + 6) + "px";
+      piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+      piece.style.animationDuration  = (Math.random() * 2 + 2) + "s";
+      piece.style.animationDelay     = (Math.random() * 1.5) + "s";
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.innerHTML = "", 5000);
+  }
+
+  // ── INIT ──
+  buildDots();
+
+  // ── ENTER KEY ──
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && currentStage <= 3) {
+      const el = document.getElementById(`input-${currentStage}`);
+      if (el && document.activeElement === el) tryUnlock(currentStage);
+    }
+  });
+</script>
+
+<!-- Tiny shake style (no layout shift) -->
+<style>
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+</style>
+</body>
+</html>

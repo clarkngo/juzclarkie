@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clark's Corner</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #07091c;
+    color: #ede8dc;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .wrap {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .title {
+    text-align: center;
+  }
+  .title h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    text-shadow: 0 0 20px rgba(201,168,76,0.3);
+    margin-bottom: 6px;
+  }
+  .title p {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #6b7a9e;
+    letter-spacing: 1px;
+  }
+
+  hr {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #1e2338;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    background: #0d1020;
+    border: 1px solid #22283c;
+    border-radius: 6px;
+    padding: 20px 18px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .card:hover { border-color: #c9a84c; box-shadow: 0 0 20px rgba(201,168,76,0.08); }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .card-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #6b7a9e;
+    margin-bottom: 4px;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #c9a84c;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 0.9rem;
+    font-style: italic;
+    font-weight: 300;
+    color: #7a7464;
+    line-height: 1.5;
+  }
+
+  .footer {
+    font-size: 0.7rem;
+    font-style: italic;
+    color: #2e3348;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">
+    <h1>Clark's Corner</h1>
+    <p>choose your adventure</p>
+  </div>
+
+  <hr>
+
+  <div class="cards">
+    <a class="card" href="./vday2026/index.html">
+      <div class="card-icon">💌</div>
+      <div class="card-label">Valentine's Day · 2026</div>
+      <div class="card-title">A Love Letter</div>
+      <div class="card-desc">Something made just for you, with all my heart.</div>
+    </a>
+
+    <a class="card" href="./juzbday2026/index.html">
+      <div class="card-icon">🖌️</div>
+      <div class="card-label">Birthday Quest · 2026</div>
+      <div class="card-title">Expedition 36</div>
+      <div class="card-desc">Born past the Paintress's decree — your scavenger hunt awaits.</div>
+    </a>
+  </div>
+
+  <hr>
+  <div class="footer">made with love · clark</div>
+</div>
+</body>
+</html>
