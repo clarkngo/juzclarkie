@@ -823,7 +823,7 @@
         </div>
         <div class="kw-section" id="kw-1">
           <div class="kw-hint">
-            Every town in Flamecraft has a resident dragon — not legendary, not magical, just a humble everyday breed. The skilled craftspeople who work alongside them share the same title. <strong>What do you call a master of their craft?</strong>
+            In Flamecraft, certain dragons are more than common fire-breathers — they are masters of their craft, capable of triggering powerful enchantments. <strong>What title is given to these gifted dragons?</strong>
           </div>
           <div class="code-row">
             <input class="code-input" id="input-1" type="text" placeholder="Enter Expedition Glyph…" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -850,8 +850,7 @@
         </div>
         <div class="kw-section" id="kw-2">
           <div class="kw-hint">
-            In Here to Slay, a core card type lets you interrupt your opponent mid-action — stopping a card play or a die roll before it resolves. It's been there since the base game, and it's one of the most satisfying moves to pull off. <strong>What do you call that kind of play?</strong>
-          </div>
+            In Here to Slay, a core card type lets you interrupt your opponent mid-action — stopping a card play or a die roll before it resolves. It's been there since the base game, and it's one of the most satisfying moves to pull off. <strong>What do you call that kind of play?</strong>          </div>
           <div class="code-row">
             <input class="code-input" id="input-2" type="text" placeholder="Enter Expedition Glyph…" autocomplete="off" autocorrect="off" spellcheck="false">
             <button class="unlock-btn" onclick="tryUnlock(2)">Advance ⚔️</button>
@@ -877,8 +876,7 @@
         </div>
         <div class="kw-section" id="kw-3">
           <div class="kw-hint">
-            In Cascadia, one animal scores big when its tiles are placed in an unbroken chain across the map — a continuous run, just like the real creature swimming upstream. <strong>Which fish swims in runs?</strong>
-          </div>
+            In Cascadia, one animal scores big when its tiles are placed in an unbroken chain across the map — a continuous run, just like the real creature swimming upstream. <strong>Which fish swims in runs?</strong>          </div>
           <div class="code-row">
             <input class="code-input" id="input-3" type="text" placeholder="Enter Expedition Glyph…" autocomplete="off" autocorrect="off" spellcheck="false">
             <button class="unlock-btn" onclick="tryUnlock(3)">Advance ⚔️</button>
@@ -896,8 +894,10 @@
           But you are Expedition 36, standing alone<br>
           past every fallen soul, past every decree,<br>
           past every cold brushstroke — alive, wild, and free.<br>
-          Descend to the sanctum. No Glyph stands in your way.<br>
-          The sweetest of victories is painted today."
+          Descend to the sanctum — but count every stair.<br>
+          Four flights await you, eight steps each to bear.<br>
+          Hold the number close. Speak it true at the door.<br>
+          The sweetest of victories is painted below."
         </div>
         <div class="descent-wrap" id="descent-wrap">
           <div class="descent-steps" id="descent-steps">The sanctum stirs below… take your time, brave adventurer.</div>
@@ -905,6 +905,12 @@
           <div class="descent-count" id="descent-count">— : —</div>
         </div>
         <div class="claim-btn-wrap" id="claim-btn-wrap">
+          <div style="text-align:center; margin-bottom:10px; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:2px; color:var(--dim);">
+            SPEAK THE PASSPHRASE AT THE DOOR
+          </div>
+          <div style="text-align:center; margin-bottom:14px; font-family:'Cinzel',serif; font-size:1.1rem; letter-spacing:3px; color:var(--gold); text-shadow:0 0 16px rgba(201,168,76,0.4);">
+            "[your count] — One Last Breath"
+          </div>
           <button class="unlock-btn" style="width:100%; padding:11px; font-size:0.85rem;" onclick="completeFinal()">
             🏆 Claim the Canvas!
           </button>
@@ -977,7 +983,7 @@
   };
 
   // ── DESCENT CONFIG ── adjust seconds to however long you need to get downstairs
-  const DESCENT_SECONDS = 180; // 3 minutes
+  const DESCENT_SECONDS = 60; // 1 minute
 
   // ── STATE ──
   let unlockedStage = 1; // furthest stage reached
@@ -1080,7 +1086,7 @@
 
     // Unlock inventory slot — reveal name + icon
     const INV_DATA = {
-      1: { icon: "🐉", name: "Flamecraft Meeps" },
+      1: { icon: "🐉", name: "Flamecraft Meeple" },
       2: { icon: "⚔️", name: "Here to Sleigh" },
       3: { icon: "🌿", name: "Cascadia" },
       4: { icon: "🎂", name: "Mousse Cake!" },
